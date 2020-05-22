@@ -103,4 +103,6 @@ func getResponse(req *http.Request) ([]byte, *ErrorResponse) {
 
 func initializeClient() {
 	client = http.Client{}
+
+	clientInitialized = true
 }
