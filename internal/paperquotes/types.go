@@ -9,3 +9,9 @@ type QuoteOfTheDayResponse struct {
 	Quote    string   `json:"quote"`
 	Tags     []string `json:"tags"`
 }
+
+// ErrorResponse is the response data if an error occurs
+type ErrorResponse struct {
+	Code    int    `json:"errno"`
+	Message string `json:"errmsg"`
+}
