@@ -16,8 +16,11 @@ var (
 	authToken         = "Your token here!!!"
 )
 
-func initializeClient() {
-	client = http.Client{}
+// GetQuoteOfTheDay gets the quote of the day and returns a QuoteOfTheDayResponse
+func GetQuoteOfTheDay() (*QuoteOfTheDayResponse, *ErrorResponse) {
+	qotdRequest := getQuoteOfTheDayRequest()
+
+	return getQuoteOfTheDayResponse(qotdRequest)
 }
 
 func getClient() http.Client {
@@ -26,6 +29,41 @@ func getClient() http.Client {
 	}
 
 	return client
+}
+
+func getGetRequest(url string, body io.Reader) *http.Request {
+	return getRequest("GET", url, body)
+}
+
+func getQuoteOfTheDayRequest() *http.Request {
+	return getGetRequest("https://api.paperquotes.com/apiv1/qod/?lang=en", nil)
+}
+
+func getQuoteOfTheDayResponse(req *http.Request) (*QuoteOfTheDayResponse, *ErrorResponse) {
+	body, errorResponse := getResponse(req)
+
+	if errorResponse != nil {
+		return nil, errorResponse
+	}
+
+	var r *QuoteOfTheDayResponse
+
+	err := json.Unmarshal(body, &r)
+
+	utils.PanicIfError(err)
+
+	return r, nil
+}
+
+func getRequest(method string, url string, body io.Reader) *http.Request {
+	req, err := http.NewRequest(method, url, body)
+
+	utils.PanicIfError(err)
+
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Authorization", fmt.Sprintf("Token %s", authToken))
+
+	return req
 }
 
 func getResponse(req *http.Request) ([]byte, *ErrorResponse) {
@@ -63,44 +101,6 @@ func getResponse(req *http.Request) ([]byte, *ErrorResponse) {
 	return body, nil
 }
 
-func getQuoteOfTheDayResponse(req *http.Request) (*QuoteOfTheDayResponse, *ErrorResponse) {
-	body, errorResponse := getResponse(req)
-
-	if errorResponse != nil {
-		return nil, errorResponse
-	}
-
-	var r *QuoteOfTheDayResponse
-
-	err := json.Unmarshal(body, &r)
-
-	utils.PanicIfError(err)
-
-	return r, nil
-}
-
-func getQuoteOfTheDayRequest() *http.Request {
-	return getGetRequest("https://api.paperquotes.com/apiv1/qod/?lang=en", nil)
-}
-
-func getGetRequest(url string, body io.Reader) *http.Request {
-	return getRequest("GET", url, body)
-}
-
-func getRequest(method string, url string, body io.Reader) *http.Request {
-	req, err := http.NewRequest(method, url, body)
-
-	utils.PanicIfError(err)
-
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", fmt.Sprintf("Token %s", authToken))
-
-	return req
-}
-
-// GetQuoteOfTheDay gets the quote of the day and returns a QuoteOfTheDayResponse
-func GetQuoteOfTheDay() (*QuoteOfTheDayResponse, *ErrorResponse) {
-	qotdRequest := getQuoteOfTheDayRequest()
-
-	return getQuoteOfTheDayResponse(qotdRequest)
+func initializeClient() {
+	client = http.Client{}
 }
