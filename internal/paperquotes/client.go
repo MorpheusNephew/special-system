@@ -6,14 +6,9 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"github.com/morpheusnephew/qotd/internal/utils"
-)
-
-var (
-	client            http.Client
-	clientInitialized = false
-	authToken         = "Your token here!!!"
 )
 
 // GetQuoteOfTheDay gets the quote of the day and returns a QuoteOfTheDayResponse
@@ -24,11 +19,7 @@ func GetQuoteOfTheDay() (*QuoteOfTheDayResponse, *ErrorResponse) {
 }
 
 func getClient() http.Client {
-	if !clientInitialized {
-		initializeClient()
-	}
-
-	return client
+	return http.Client{}
 }
 
 func getGetRequest(url string, body io.Reader) *http.Request {
@@ -59,6 +50,8 @@ func getRequest(method string, url string, body io.Reader) *http.Request {
 	req, err := http.NewRequest(method, url, body)
 
 	utils.PanicIfError(err)
+
+	authToken := os.Getenv("PAPER_QUOTES_TOKEN")
 
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Authorization", fmt.Sprintf("Token %s", authToken))
@@ -99,10 +92,4 @@ func getResponse(req *http.Request) ([]byte, *ErrorResponse) {
 	}
 
 	return body, nil
-}
-
-func initializeClient() {
-	client = http.Client{}
-
-	clientInitialized = true
 }
