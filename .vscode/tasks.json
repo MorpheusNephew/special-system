@@ -7,6 +7,16 @@
             "label": "Run main",
             "type": "shell",
             "command": "go run .\\cmd\\qotd\\main.go"
+        },
+        {
+            "label": "Tidy dependencies",
+            "type": "shell",
+            "command": "go mod tidy"
+        },
+        {
+            "label": "Download modules locally",
+            "type": "shell",
+            "command": "go mod download"
         }
     ]
 }
