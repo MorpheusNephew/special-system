@@ -17,6 +17,11 @@
             "label": "Download modules locally",
             "type": "shell",
             "command": "go mod download"
+        },
+        {
+            "label": "Run tests",
+            "type": "shell",
+            "command": "go test ./..."
         }
     ]
 }
