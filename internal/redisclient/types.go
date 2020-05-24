@@ -12,7 +12,7 @@ import (
 // IClient an interface representing getting and setting data in Redis
 type IClient interface {
 	GetValue(key string) ([]byte, error)
-	SetValue(key string, value []byte) (string, error)
+	SetValue(key string, value []byte, t *time.Duration) (string, error)
 	GetInitialized() bool
 	SetInitialized(value bool)
 }
@@ -76,7 +76,7 @@ func (c *Client) GetValue(key string) ([]byte, error) {
 }
 
 // SetValue sets value in Redis with a given key
-func (c *Client) SetValue(key string, value []byte) (string, error) {
+func (c *Client) SetValue(key string, value []byte, t *time.Duration) (string, error) {
 	if !c.initialized {
 		return "", nil
 	}
@@ -85,7 +85,11 @@ func (c *Client) SetValue(key string, value []byte) (string, error) {
 
 	defer ctx.Done()
 
-	return c.cache.Set(ctx, key, value, time.Hour*2).Result()
+	if t == nil {
+		*t = time.Hour * 24
+	}
+
+	return c.cache.Set(ctx, key, value, *t).Result()
 }
 
 // GetInitialized gets the initialized value

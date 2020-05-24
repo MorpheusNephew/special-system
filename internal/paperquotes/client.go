@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"time"
 
 	"github.com/morpheusnephew/qotd/internal/redisclient"
 	"github.com/morpheusnephew/qotd/internal/utils"
@@ -94,7 +95,18 @@ func getResponse(redisKey string, req *http.Request) ([]byte, *ErrorResponse) {
 
 	utils.PanicIfError(err)
 
-	redisClientFactory.GetRedisClient().SetValue(redisKey, body)
+	var cacheTTL *time.Duration = nil
+	expiresHeader := response.Header.Get("Expires")
+
+	if len(expiresHeader) > 0 {
+		expiresHeaderGMT, err := time.Parse("Mon, 02 Jan 2006 15:04:05 MST", expiresHeader)
+
+		utils.PanicIfError(err)
+
+		*cacheTTL = expiresHeaderGMT.UTC().Sub(time.Now().UTC())
+	}
+
+	redisClientFactory.GetRedisClient().SetValue(redisKey, body, cacheTTL)
 
 	return body, nil
 }

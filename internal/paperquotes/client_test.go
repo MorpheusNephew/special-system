@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/morpheusnephew/qotd/internal/redisclient"
 	"github.com/morpheusnephew/qotd/internal/testutils"
@@ -46,7 +47,7 @@ func (c *MockRedisClient) GetValue(key string) ([]byte, error) {
 	return []byte(`{ "data" : "hello world!!!"}`), nil
 }
 
-func (c *MockRedisClient) SetValue(key string, value []byte) (string, error) {
+func (c *MockRedisClient) SetValue(key string, value []byte, t *time.Duration) (string, error) {
 
 	return "Set", nil
 }
