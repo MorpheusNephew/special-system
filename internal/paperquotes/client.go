@@ -17,25 +17,25 @@ type iHTTPClient interface {
 }
 
 var (
-	client      iHTTPClient
-	redisClient redisclient.IClient
+	client             iHTTPClient
+	redisClientFactory redisclient.IClientFactory
 )
 
 func init() {
 	client = &http.Client{}
-	redisClient = redisclient.GetRedisClient()
+	redisClientFactory = &redisclient.ClientFactory{}
 }
 
 // GetQuoteOfTheDay gets the quote of the day and returns a QuoteOfTheDayResponse
 func GetQuoteOfTheDay() (*QuoteOfTheDayResponse, *ErrorResponse) {
 	redisKey := fmt.Sprintf("%v-qotd", variables.RedisKeyPrefix)
 
-	redisClient.GetValue(redisKey)
+	redisClientFactory.GetRedisClient().GetValue(redisKey)
 
 	body, errorResponse := retrieveData(redisKey, func() ([]byte, *ErrorResponse) {
 		qotdRequest := getQuoteOfTheDayRequest()
 
-		return getResponse(qotdRequest)
+		return getResponse(redisKey, qotdRequest)
 	})
 
 	if errorResponse != nil {
@@ -45,20 +45,6 @@ func GetQuoteOfTheDay() (*QuoteOfTheDayResponse, *ErrorResponse) {
 	quoteOfTheDayResponse, errorResponse := getQuoteOfTheDayResponse(body)
 
 	return quoteOfTheDayResponse, errorResponse
-}
-
-func retrieveData(redisKey string, f func() ([]byte, *ErrorResponse)) ([]byte, *ErrorResponse) {
-	cacheResponse, _ := redisClient.GetValue(redisKey)
-
-	if len(cacheResponse) > 0 {
-		return cacheResponse, nil
-	}
-
-	body, errorResponse := f()
-
-	redisClient.SetValue(redisKey, body)
-
-	return body, errorResponse
 }
 
 func getGetRequest(url string, body io.Reader) *http.Request {
@@ -90,35 +76,37 @@ func getRequest(method string, url string, body io.Reader) *http.Request {
 	return req
 }
 
-func getResponse(req *http.Request) ([]byte, *ErrorResponse) {
+func getResponse(redisKey string, req *http.Request) ([]byte, *ErrorResponse) {
 	response, err := client.Do(req)
 
 	utils.PanicIfError(err)
 
 	defer response.Body.Close()
 
-	var e *ErrorResponse
-
 	if response.StatusCode >= 400 {
-		e = &ErrorResponse{
+		return nil, &ErrorResponse{
 			Code:    response.StatusCode,
 			Message: response.Status[4:],
 		}
-
-		return nil, e
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
 
 	utils.PanicIfError(err)
 
-	err = json.Unmarshal(body, &e)
-
-	utils.PanicIfError(err)
-
-	if e.Code > 0 {
-		return nil, e
-	}
+	redisClientFactory.GetRedisClient().SetValue(redisKey, body)
 
 	return body, nil
+}
+
+func retrieveData(redisKey string, f func() ([]byte, *ErrorResponse)) ([]byte, *ErrorResponse) {
+	cacheResponse, _ := redisClientFactory.GetRedisClient().GetValue(redisKey)
+
+	if len(cacheResponse) > 0 {
+		return cacheResponse, nil
+	}
+
+	body, errorResponse := f()
+
+	return body, errorResponse
 }
