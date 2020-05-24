@@ -27,7 +27,13 @@ func init() {
 func GetQuoteOfTheDay() (*QuoteOfTheDayResponse, *ErrorResponse) {
 	qotdRequest := getQuoteOfTheDayRequest()
 
-	return getQuoteOfTheDayResponse(qotdRequest)
+	body, errorResponse := getResponse(qotdRequest)
+
+	if errorResponse != nil {
+		return nil, errorResponse
+	}
+
+	return getQuoteOfTheDayResponse(body)
 }
 
 func getGetRequest(url string, body io.Reader) *http.Request {
@@ -38,13 +44,7 @@ func getQuoteOfTheDayRequest() *http.Request {
 	return getGetRequest("https://api.paperquotes.com/apiv1/qod/?lang=en", nil)
 }
 
-func getQuoteOfTheDayResponse(req *http.Request) (*QuoteOfTheDayResponse, *ErrorResponse) {
-	body, errorResponse := getResponse(req)
-
-	if errorResponse != nil {
-		return nil, errorResponse
-	}
-
+func getQuoteOfTheDayResponse(body []byte) (*QuoteOfTheDayResponse, *ErrorResponse) {
 	var r *QuoteOfTheDayResponse
 
 	err := json.Unmarshal(body, &r)

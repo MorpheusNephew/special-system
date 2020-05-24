@@ -35,6 +35,26 @@ func (c *UnsuccessfulMockClient) Do(req *http.Request) (*http.Response, error) {
 	}, nil
 }
 
+func Test_getQuoteOfTheDayResponse(t *testing.T) {
+	expectedQuoteOfTheDayResponse := &QuoteOfTheDayResponse{
+		Author:   "Confucius",
+		Likes:    200,
+		Language: "en",
+		Tags:     []string{"Inspirational"},
+		Quote:    "Those who say they can and those who say they can't are both right",
+	}
+
+	data, _ := json.Marshal(expectedQuoteOfTheDayResponse)
+
+	quoteOfTheDayResponse, _ := getQuoteOfTheDayResponse(data)
+
+	testutils.IfStringsNotEqual(t, quoteOfTheDayResponse.Quote, expectedQuoteOfTheDayResponse.Quote)
+	testutils.IfStringsNotEqual(t, quoteOfTheDayResponse.Author, expectedQuoteOfTheDayResponse.Author)
+	testutils.IfStringsNotEqual(t, quoteOfTheDayResponse.Language, expectedQuoteOfTheDayResponse.Language)
+	testutils.IfStringsNotEqual(t, quoteOfTheDayResponse.Tags[0], expectedQuoteOfTheDayResponse.Tags[0])
+	testutils.IfIntsNotEqual(t, quoteOfTheDayResponse.Likes, expectedQuoteOfTheDayResponse.Likes)
+}
+
 func Test_getRequest(t *testing.T) {
 	expectedMethod := http.MethodGet
 	expectedURL := "www.testurl.com"
