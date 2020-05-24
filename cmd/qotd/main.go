@@ -4,13 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/joho/godotenv"
 	"github.com/morpheusnephew/qotd/internal/paperquotes"
 )
-
-func init() {
-	godotenv.Load()
-}
 
 func main() {
 	response, errorResponse := paperquotes.GetQuoteOfTheDay()
