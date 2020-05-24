@@ -6,25 +6,32 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
 
+	"github.com/morpheusnephew/qotd/internal/redis"
 	"github.com/morpheusnephew/qotd/internal/utils"
+	"github.com/morpheusnephew/qotd/internal/variables"
 )
 
-type httpClient interface {
+type iHTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
 var (
-	client httpClient
+	client      iHTTPClient
+	redisClient redis.IClient
 )
 
 func init() {
 	client = &http.Client{}
+	redisClient = &redis.Client{}
 }
 
 // GetQuoteOfTheDay gets the quote of the day and returns a QuoteOfTheDayResponse
 func GetQuoteOfTheDay() (*QuoteOfTheDayResponse, *ErrorResponse) {
+	redisKey := variables.RedisKey
+
+	redisClient.GetValue(redisKey)
+
 	qotdRequest := getQuoteOfTheDayRequest()
 
 	body, errorResponse := getResponse(qotdRequest)
@@ -33,7 +40,11 @@ func GetQuoteOfTheDay() (*QuoteOfTheDayResponse, *ErrorResponse) {
 		return nil, errorResponse
 	}
 
-	return getQuoteOfTheDayResponse(body)
+	quoteOfTheDayResponse, errorResponse := getQuoteOfTheDayResponse(body)
+
+	redisClient.SetValue(redisKey)
+
+	return quoteOfTheDayResponse, errorResponse
 }
 
 func getGetRequest(url string, body io.Reader) *http.Request {
@@ -59,10 +70,8 @@ func getRequest(method string, url string, body io.Reader) *http.Request {
 
 	utils.PanicIfError(err)
 
-	authToken := os.Getenv("PAPER_QUOTES_TOKEN")
-
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", fmt.Sprintf("Token %s", authToken))
+	req.Header.Add("Authorization", fmt.Sprintf("Token %s", variables.PaperQuotesToken))
 
 	return req
 }
