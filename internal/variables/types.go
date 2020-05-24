@@ -7,16 +7,16 @@ import (
 )
 
 var (
-	// RedisKey is the key used for getting/setting quote of the day in Redis
-	RedisKey string
-
 	// PaperQuotesToken is the token used to get the quote of the day
 	PaperQuotesToken string
+
+	// RedisKey is the key used for getting/setting quote of the day in Redis
+	RedisKey string
 )
 
 func init() {
 	godotenv.Load()
 
-	RedisKey = os.Getenv("REDIS_KEY")
 	PaperQuotesToken = os.Getenv("PAPER_QUOTES_TOKEN")
+	RedisKey = os.Getenv("REDIS_KEY")
 }
