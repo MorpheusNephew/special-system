@@ -2,17 +2,27 @@ package paperquotes
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 	"testing"
+	"time"
 
+	"github.com/morpheusnephew/qotd/internal/redisclient"
 	"github.com/morpheusnephew/qotd/internal/testutils"
 )
 
 type SuccessfulMockClient struct {
+}
+
+type UnsuccessfulMockClient struct {
+}
+
+type MockRedisClient struct {
+}
+
+type MockRedisClientFactory struct {
+	client redisclient.IClient
 }
 
 func (c *SuccessfulMockClient) Do(req *http.Request) (*http.Response, error) {
@@ -23,9 +33,6 @@ func (c *SuccessfulMockClient) Do(req *http.Request) (*http.Response, error) {
 	}, nil
 }
 
-type UnsuccessfulMockClient struct {
-}
-
 func (c *UnsuccessfulMockClient) Do(req *http.Request) (*http.Response, error) {
 	body := ioutil.NopCloser(strings.NewReader(`{ "data" : "hello world!!!"}`))
 	return &http.Response{
@@ -33,6 +40,27 @@ func (c *UnsuccessfulMockClient) Do(req *http.Request) (*http.Response, error) {
 		Status:     "400 Bad Request",
 		Body:       body,
 	}, nil
+}
+
+func (c *MockRedisClient) GetValue(key string) ([]byte, error) {
+
+	return []byte(`{ "data" : "hello world!!!"}`), nil
+}
+
+func (c *MockRedisClient) SetValue(key string, value []byte, t *time.Duration) (string, error) {
+
+	return "Set", nil
+}
+
+func (c *MockRedisClient) GetInitialized() bool {
+	return true
+}
+
+func (c *MockRedisClient) SetInitialized(value bool) {
+}
+
+func (cf *MockRedisClientFactory) GetRedisClient() redisclient.IClient {
+	return &MockRedisClient{}
 }
 
 func Test_getQuoteOfTheDayResponse(t *testing.T) {
@@ -58,8 +86,6 @@ func Test_getQuoteOfTheDayResponse(t *testing.T) {
 func Test_getRequest(t *testing.T) {
 	expectedMethod := http.MethodGet
 	expectedURL := "www.testurl.com"
-	expectedToken := "myToken"
-	os.Setenv("PAPER_QUOTES_TOKEN", expectedToken)
 
 	r := getRequest(expectedMethod, expectedURL, nil)
 
@@ -71,13 +97,14 @@ func Test_getRequest(t *testing.T) {
 	testutils.IfStringsNotEqual(t, ct, expectedContentType)
 
 	auth := r.Header.Get("Authorization")
-	testutils.IfStringsNotEqual(t, auth, fmt.Sprintf("Token %v", expectedToken))
+	testutils.IfStringIsEmpty(t, auth)
 }
 
 func Test_getResponse_Successfully(t *testing.T) {
 	client = &SuccessfulMockClient{}
+	redisClientFactory = &MockRedisClientFactory{}
 
-	body, _ := getResponse(&http.Request{})
+	body, _ := getResponse("test", &http.Request{})
 
 	var res map[string]string
 
@@ -89,7 +116,7 @@ func Test_getResponse_Successfully(t *testing.T) {
 func Test_getResponse_Unsuccessfully(t *testing.T) {
 	client = &UnsuccessfulMockClient{}
 
-	_, err := getResponse(&http.Request{})
+	_, err := getResponse("test", &http.Request{})
 
 	testutils.IfIntsNotEqual(t, err.Code, 400)
 	testutils.IfStringsNotEqual(t, err.Message, "Bad Request")
