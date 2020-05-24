@@ -4,7 +4,7 @@ An application written in Go to get the quote of the day. The vision, if you wil
 
 ## Step 3: Implement caching
 
-This step includes implementing caching for the quote of the day application so that it does not hit the 500 API call per month for the free tier. I will be using [AWS ElastiCache for Redis][redis] to store the information for the quote of the day until the quote changes, which I can gather that information from the expires header.
+This step includes implementing caching for the quote of the day application so that it does not hit the 500 API call per month for the free tier. I will be using [Redis][redis] to store the information for the quote of the day until the quote changes, which I can gather that information from the expires header.
 
 ## Step 2: Adding unit tests for application code
 
@@ -20,4 +20,4 @@ For anyone who may gaze upon my code, I just wanted to first note that the short
 
 [paper-quotes]: http://paperquotes.com/
 [golang]: https://github.com/golang/go/wiki/CodeReviewComments#variable-names
-[redis]: https://aws.amazon.com/elasticache/redis/?nc=sn&loc=2&dn=1
+[redis]: https://redis.io/
