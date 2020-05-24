@@ -28,13 +28,15 @@ func init() {
 
 // GetQuoteOfTheDay gets the quote of the day and returns a QuoteOfTheDayResponse
 func GetQuoteOfTheDay() (*QuoteOfTheDayResponse, *ErrorResponse) {
-	redisKey := variables.RedisKey
+	redisKey := fmt.Sprintf("%v-qotd", variables.RedisKeyPrefix)
 
 	redisClient.GetValue(redisKey)
 
-	qotdRequest := getQuoteOfTheDayRequest()
+	body, errorResponse := retrieveData(redisKey, func() ([]byte, *ErrorResponse) {
+		qotdRequest := getQuoteOfTheDayRequest()
 
-	body, errorResponse := getResponse(qotdRequest)
+		return getResponse(qotdRequest)
+	})
 
 	if errorResponse != nil {
 		return nil, errorResponse
@@ -42,9 +44,21 @@ func GetQuoteOfTheDay() (*QuoteOfTheDayResponse, *ErrorResponse) {
 
 	quoteOfTheDayResponse, errorResponse := getQuoteOfTheDayResponse(body)
 
-	redisClient.SetValue(redisKey)
-
 	return quoteOfTheDayResponse, errorResponse
+}
+
+func retrieveData(redisKey string, f func() ([]byte, *ErrorResponse)) ([]byte, *ErrorResponse) {
+	cacheResponse, _ := redisClient.GetValue(redisKey)
+
+	if len(cacheResponse) > 0 {
+		return cacheResponse, nil
+	}
+
+	body, errorResponse := f()
+
+	redisClient.SetValue(redisKey, body)
+
+	return body, errorResponse
 }
 
 func getGetRequest(url string, body io.Reader) *http.Request {

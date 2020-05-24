@@ -2,15 +2,15 @@ package redisclient
 
 import (
 	"context"
-	"fmt"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 )
 
 // IClient an interface representing getting and setting data in Redis
 type IClient interface {
-	GetValue(key string)
-	SetValue(key string)
+	GetValue(key string) ([]byte, error)
+	SetValue(key string, value []byte) (string, error)
 }
 
 // Client is the client for interacting with Redis
@@ -19,27 +19,21 @@ type Client struct {
 }
 
 // GetValue gets value from Redis with a given key
-func (c *Client) GetValue(key string) {
+func (c *Client) GetValue(key string) ([]byte, error) {
 	ctx := context.Background()
 
 	defer ctx.Done()
 
-	stuff := c.cache.Get(ctx, key)
+	dataValue, err := c.cache.Get(ctx, key).Result()
 
-	if stuff != nil {
-		fmt.Printf("Retrieved from redis %v\n", stuff)
-	} else {
-		fmt.Println("Nothing retrieved from Redis")
-	}
-
-	fmt.Printf("GetValue was called with key: %v\n", key)
+	return []byte(dataValue), err
 }
 
 // SetValue sets value in Redis with a given key
-func (c *Client) SetValue(key string) {
+func (c *Client) SetValue(key string, value []byte) (string, error) {
 	ctx := context.Background()
 
 	defer ctx.Done()
 
-	fmt.Printf("SetValue was called with key: %v\n", key)
+	return c.cache.Set(ctx, key, value, time.Hour*2).Result()
 }

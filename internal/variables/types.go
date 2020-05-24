@@ -13,8 +13,8 @@ var (
 	// RedisEndpoint is the endpoint for interacting with Redis
 	RedisEndpoint string
 
-	// RedisKey is the key used for getting/setting quote of the day in Redis
-	RedisKey string
+	// RedisKeyPrefix is the key used for getting/setting quote of the day in Redis
+	RedisKeyPrefix string
 
 	// RedisPort is the port used with interacting with Redis
 	RedisPort string
@@ -25,6 +25,6 @@ func init() {
 
 	PaperQuotesToken = os.Getenv("PAPER_QUOTES_TOKEN")
 	RedisEndpoint = os.Getenv("REDIS_ENDPOINT")
-	RedisKey = os.Getenv("REDIS_KEY")
+	RedisKeyPrefix = os.Getenv("REDIS_KEY_PREFIX")
 	RedisPort = os.Getenv("REDIS_PORT")
 }
