@@ -6,34 +6,46 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
+	"time"
 
+	"github.com/morpheusnephew/qotd/internal/redisclient"
 	"github.com/morpheusnephew/qotd/internal/utils"
+	"github.com/morpheusnephew/qotd/internal/variables"
 )
 
-type httpClient interface {
+type iHTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
 var (
-	client httpClient
+	client             iHTTPClient
+	redisClientFactory redisclient.IClientFactory
 )
 
 func init() {
 	client = &http.Client{}
+	redisClientFactory = &redisclient.ClientFactory{}
 }
 
 // GetQuoteOfTheDay gets the quote of the day and returns a QuoteOfTheDayResponse
 func GetQuoteOfTheDay() (*QuoteOfTheDayResponse, *ErrorResponse) {
-	qotdRequest := getQuoteOfTheDayRequest()
+	redisKey := fmt.Sprintf("%v-qotd", variables.RedisKeyPrefix)
 
-	body, errorResponse := getResponse(qotdRequest)
+	redisClientFactory.GetRedisClient().GetValue(redisKey)
+
+	body, errorResponse := retrieveData(redisKey, func() ([]byte, *ErrorResponse) {
+		qotdRequest := getQuoteOfTheDayRequest()
+
+		return getResponse(redisKey, qotdRequest)
+	})
 
 	if errorResponse != nil {
 		return nil, errorResponse
 	}
 
-	return getQuoteOfTheDayResponse(body)
+	quoteOfTheDayResponse, errorResponse := getQuoteOfTheDayResponse(body)
+
+	return quoteOfTheDayResponse, errorResponse
 }
 
 func getGetRequest(url string, body io.Reader) *http.Request {
@@ -59,43 +71,54 @@ func getRequest(method string, url string, body io.Reader) *http.Request {
 
 	utils.PanicIfError(err)
 
-	authToken := os.Getenv("PAPER_QUOTES_TOKEN")
-
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("Authorization", fmt.Sprintf("Token %s", authToken))
+	req.Header.Add("Authorization", fmt.Sprintf("Token %s", variables.PaperQuotesToken))
 
 	return req
 }
 
-func getResponse(req *http.Request) ([]byte, *ErrorResponse) {
+func getResponse(redisKey string, req *http.Request) ([]byte, *ErrorResponse) {
 	response, err := client.Do(req)
 
 	utils.PanicIfError(err)
 
 	defer response.Body.Close()
 
-	var e *ErrorResponse
-
 	if response.StatusCode >= 400 {
-		e = &ErrorResponse{
+		return nil, &ErrorResponse{
 			Code:    response.StatusCode,
 			Message: response.Status[4:],
 		}
-
-		return nil, e
 	}
 
 	body, err := ioutil.ReadAll(response.Body)
 
 	utils.PanicIfError(err)
 
-	err = json.Unmarshal(body, &e)
+	var cacheTTL *time.Duration = nil
+	expiresHeader := response.Header.Get("Expires")
 
-	utils.PanicIfError(err)
+	if len(expiresHeader) > 0 {
+		expiresHeaderGMT, err := time.Parse("Mon, 02 Jan 2006 15:04:05 MST", expiresHeader)
 
-	if e.Code > 0 {
-		return nil, e
+		utils.PanicIfError(err)
+
+		*cacheTTL = expiresHeaderGMT.UTC().Sub(time.Now().UTC())
 	}
 
+	redisClientFactory.GetRedisClient().SetValue(redisKey, body, cacheTTL)
+
 	return body, nil
+}
+
+func retrieveData(redisKey string, f func() ([]byte, *ErrorResponse)) ([]byte, *ErrorResponse) {
+	cacheResponse, _ := redisClientFactory.GetRedisClient().GetValue(redisKey)
+
+	if len(cacheResponse) > 0 {
+		return cacheResponse, nil
+	}
+
+	body, errorResponse := f()
+
+	return body, errorResponse
 }
