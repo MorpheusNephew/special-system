@@ -9,9 +9,11 @@ import (
 
 func main() {
 	response, errorResponse := paperquotes.GetQuoteOfTheDay()
+	var err error = nil
 
 	if errorResponse != nil {
-		log.Fatalln(errorResponse)
+		err = fmt.Errorf("%v %v", errorResponse.Code, errorResponse.Message)
+		log.Fatalln(err)
 	} else {
 		fmt.Println(response)
 	}
