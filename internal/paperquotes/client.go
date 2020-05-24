@@ -11,32 +11,40 @@ import (
 	"github.com/morpheusnephew/qotd/internal/utils"
 )
 
+type httpClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
+var (
+	client httpClient
+)
+
+func init() {
+	client = &http.Client{}
+}
+
 // GetQuoteOfTheDay gets the quote of the day and returns a QuoteOfTheDayResponse
 func GetQuoteOfTheDay() (*QuoteOfTheDayResponse, *ErrorResponse) {
 	qotdRequest := getQuoteOfTheDayRequest()
 
-	return getQuoteOfTheDayResponse(qotdRequest)
-}
+	body, errorResponse := getResponse(qotdRequest)
 
-func getClient() http.Client {
-	return http.Client{}
+	if errorResponse != nil {
+		return nil, errorResponse
+	}
+
+	return getQuoteOfTheDayResponse(body)
 }
 
 func getGetRequest(url string, body io.Reader) *http.Request {
-	return getRequest("GET", url, body)
+	return getRequest(http.MethodGet, url, body)
 }
 
 func getQuoteOfTheDayRequest() *http.Request {
 	return getGetRequest("https://api.paperquotes.com/apiv1/qod/?lang=en", nil)
 }
 
-func getQuoteOfTheDayResponse(req *http.Request) (*QuoteOfTheDayResponse, *ErrorResponse) {
-	body, errorResponse := getResponse(req)
-
-	if errorResponse != nil {
-		return nil, errorResponse
-	}
-
+func getQuoteOfTheDayResponse(body []byte) (*QuoteOfTheDayResponse, *ErrorResponse) {
 	var r *QuoteOfTheDayResponse
 
 	err := json.Unmarshal(body, &r)
@@ -60,9 +68,7 @@ func getRequest(method string, url string, body io.Reader) *http.Request {
 }
 
 func getResponse(req *http.Request) ([]byte, *ErrorResponse) {
-	qotdClient := getClient()
-
-	response, err := qotdClient.Do(req)
+	response, err := client.Do(req)
 
 	utils.PanicIfError(err)
 

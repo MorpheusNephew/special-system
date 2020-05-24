@@ -8,9 +8,11 @@ import (
 	"github.com/morpheusnephew/qotd/internal/paperquotes"
 )
 
-func main() {
+func init() {
 	godotenv.Load()
+}
 
+func main() {
 	response, errorResponse := paperquotes.GetQuoteOfTheDay()
 
 	if errorResponse != nil {
