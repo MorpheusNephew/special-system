@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/morpheusnephew/qotd/internal/redis"
+	"github.com/morpheusnephew/qotd/internal/redisclient"
 	"github.com/morpheusnephew/qotd/internal/utils"
 	"github.com/morpheusnephew/qotd/internal/variables"
 )
@@ -18,12 +18,12 @@ type iHTTPClient interface {
 
 var (
 	client      iHTTPClient
-	redisClient redis.IClient
+	redisClient redisclient.IClient
 )
 
 func init() {
 	client = &http.Client{}
-	redisClient = &redis.Client{}
+	redisClient = redisclient.GetRedisClient()
 }
 
 // GetQuoteOfTheDay gets the quote of the day and returns a QuoteOfTheDayResponse
