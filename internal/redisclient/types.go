@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/morpheusnephew/qotd/internal/utils"
 	"github.com/morpheusnephew/qotd/internal/variables"
 )
 
@@ -14,11 +13,14 @@ import (
 type IClient interface {
 	GetValue(key string) ([]byte, error)
 	SetValue(key string, value []byte) (string, error)
+	GetInitialized() bool
+	SetInitialized(value bool)
 }
 
 // Client is the client for interacting with Redis
 type Client struct {
-	cache *redis.Client
+	cache       *redis.Client
+	initialized bool
 }
 
 // IClientFactory is an interface for client factory
@@ -31,8 +33,39 @@ type ClientFactory struct {
 	client IClient
 }
 
+// GetRedisClient is a method to get the Redis client
+func (cf *ClientFactory) GetRedisClient() IClient {
+	if cf.client == nil || !cf.client.GetInitialized() {
+		endpoint := fmt.Sprintf("%v:%v", variables.RedisEndpoint, variables.RedisPort)
+		cache := redis.NewClient(&redis.Options{
+			Addr: endpoint,
+		})
+
+		ctx := context.Background()
+		defer ctx.Done()
+
+		_, err := cache.Ping(ctx).Result()
+
+		cf.client = &Client{
+			cache: cache,
+		}
+
+		if err != nil {
+			cf.client.SetInitialized(false)
+		} else {
+			cf.client.SetInitialized(true)
+		}
+	}
+
+	return cf.client
+}
+
 // GetValue gets value from Redis with a given key
 func (c *Client) GetValue(key string) ([]byte, error) {
+	if !c.initialized {
+		return []byte{}, nil
+	}
+
 	ctx := context.Background()
 
 	defer ctx.Done()
@@ -44,6 +77,10 @@ func (c *Client) GetValue(key string) ([]byte, error) {
 
 // SetValue sets value in Redis with a given key
 func (c *Client) SetValue(key string, value []byte) (string, error) {
+	if !c.initialized {
+		return "", nil
+	}
+
 	ctx := context.Background()
 
 	defer ctx.Done()
@@ -51,25 +88,12 @@ func (c *Client) SetValue(key string, value []byte) (string, error) {
 	return c.cache.Set(ctx, key, value, time.Hour*2).Result()
 }
 
-// GetRedisClient is a method to get the Redis client
-func (cf *ClientFactory) GetRedisClient() IClient {
-	if cf.client == nil {
-		endpoint := fmt.Sprintf("%v:%v", variables.RedisEndpoint, variables.RedisPort)
-		cache := redis.NewClient(&redis.Options{
-			Addr: endpoint,
-		})
+// GetInitialized gets the initialized value
+func (c *Client) GetInitialized() bool {
+	return c.initialized
+}
 
-		ctx := context.Background()
-		defer ctx.Done()
-
-		_, err := cache.Ping(ctx).Result()
-
-		utils.PanicIfError(err)
-
-		cf.client = &Client{
-			cache: cache,
-		}
-	}
-
-	return cf.client
+// SetInitialized sets the initialized value
+func (c *Client) SetInitialized(value bool) {
+	c.initialized = value
 }

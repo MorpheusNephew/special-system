@@ -51,6 +51,13 @@ func (c *MockRedisClient) SetValue(key string, value []byte) (string, error) {
 	return "Set", nil
 }
 
+func (c *MockRedisClient) GetInitialized() bool {
+	return true
+}
+
+func (c *MockRedisClient) SetInitialized(value bool) {
+}
+
 func (cf *MockRedisClientFactory) GetRedisClient() redisclient.IClient {
 	return &MockRedisClient{}
 }
