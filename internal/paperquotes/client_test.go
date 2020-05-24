@@ -2,8 +2,10 @@ package paperquotes
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 
@@ -36,11 +38,20 @@ func (c *UnsuccessfulMockClient) Do(req *http.Request) (*http.Response, error) {
 func Test_getRequest(t *testing.T) {
 	expectedMethod := http.MethodGet
 	expectedURL := "www.testurl.com"
+	expectedToken := "myToken"
+	os.Setenv("PAPER_QUOTES_TOKEN", expectedToken)
 
 	r := getRequest(expectedMethod, expectedURL, nil)
 
 	testutils.IfStringsNotEqual(t, r.Method, expectedMethod)
 	testutils.IfStringsNotEqual(t, r.URL.String(), expectedURL)
+
+	expectedContentType := "application/json"
+	ct := r.Header.Get("Content-Type")
+	testutils.IfStringsNotEqual(t, ct, expectedContentType)
+
+	auth := r.Header.Get("Authorization")
+	testutils.IfStringsNotEqual(t, auth, fmt.Sprintf("Token %v", expectedToken))
 }
 
 func Test_getResponse_Successfully(t *testing.T) {
