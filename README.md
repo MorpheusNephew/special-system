@@ -2,7 +2,7 @@
 
 An application written in Go to get the quote of the day. The vision, if you will, for this application is to automatically be deployed to a Lambda function where it can be accessed via AWS API Gateway. I'm writing this in Go because I've been interested in using a language that I do not program in professionally.
 
-## Step 3: Implement caching (Current)
+## Step 3: Implement caching
 
 This step includes implementing caching for the quote of the day application so that it does not hit the 500 API call per month for the free tier. I will be using [AWS ElastiCache for Redis][redis] to store the information for the quote of the day until the quote changes, which I can gather that information from the expires header.
 
