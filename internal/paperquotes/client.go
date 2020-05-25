@@ -95,7 +95,8 @@ func getResponse(redisKey string, req *http.Request) ([]byte, *ErrorResponse) {
 
 	utils.PanicIfError(err)
 
-	cacheTTL := time.Hour * 24
+	var cacheTTL time.Duration
+
 	expiresHeader := response.Header.Get("Expires")
 
 	if len(expiresHeader) > 0 {
