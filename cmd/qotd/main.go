@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/morpheusnephew/qotd/internal/paperquotes"
@@ -16,7 +17,7 @@ func HandleRequest(ctx context.Context) (*paperquotes.QuoteOfTheDayResponse, *pa
 }
 
 func main() {
-	if variables.Environment == "local" {
+	if strings.ToLower(variables.Environment) == "local" {
 		getQuoteOfTheDay()
 	} else {
 		lambda.Start(HandleRequest)
