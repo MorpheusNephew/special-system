@@ -95,7 +95,7 @@ func getResponse(redisKey string, req *http.Request) ([]byte, *ErrorResponse) {
 
 	utils.PanicIfError(err)
 
-	var cacheTTL *time.Duration = nil
+	cacheTTL := time.Hour * 24
 	expiresHeader := response.Header.Get("Expires")
 
 	if len(expiresHeader) > 0 {
@@ -104,10 +104,10 @@ func getResponse(redisKey string, req *http.Request) ([]byte, *ErrorResponse) {
 		utils.PanicIfError(err)
 
 		// TODO (JJ): Find a way to get the absolute value of the tme difference
-		*cacheTTL = expiresHeaderGMT.UTC().Sub(time.Now().UTC())
+		cacheTTL = expiresHeaderGMT.UTC().Sub(time.Now().UTC())
 	}
 
-	redisClientFactory.GetRedisClient().SetValue(redisKey, body, cacheTTL)
+	redisClientFactory.GetRedisClient().SetValue(redisKey, body, &cacheTTL)
 
 	return body, nil
 }
