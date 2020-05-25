@@ -103,6 +103,7 @@ func getResponse(redisKey string, req *http.Request) ([]byte, *ErrorResponse) {
 
 		utils.PanicIfError(err)
 
+		// TODO (JJ): Find a way to get the absolute value of the tme difference
 		*cacheTTL = expiresHeaderGMT.UTC().Sub(time.Now().UTC())
 	}
 
