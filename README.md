@@ -4,7 +4,11 @@ An application written in Go to get the quote of the day. The vision, if you wil
 
 ## Step 4: Configure application for AWS Lambda (Current)
 
-This step will include modifying the application code to work for AWS Lambda as well as creating the yaml file that'll be used in conjunction with AWS Code Pipeline for building the application and deploying it to a lambda function
+This step will include modifying the application code to work for AWS Lambda as well as creating the yaml file that'll be used in conjunction with AWS Code Pipeline for building the application and deploying it to a lambda function.
+
+### Note
+
+Lambda functions written in Go use the standard fmt package to log to [CloudWatch logs](https://docs.aws.amazon.com/lambda/latest/dg/golang-logging.html)
 
 ## Step 3: Implement caching (Completed)
 
