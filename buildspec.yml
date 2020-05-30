@@ -11,8 +11,8 @@ phases:
     build:
         commands:
             - echo Entering build phase
-            - go build ./cmd/qotd/main.go
+            - go build ./cmd/qotd.go
     post_build:
         commands:
             - echo Entering post build phase
-            - ./main
+            - ./gotd
