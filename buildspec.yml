@@ -15,4 +15,4 @@ phases:
     post_build:
         commands:
             - echo Entering post build phase
-            - ./gotd
+            - ./qotd
