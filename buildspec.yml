@@ -16,3 +16,8 @@ phases:
         commands:
             - echo Entering post build phase
             - ./qotd
+            - zip qotd.zip qotd
+            - ls
+artifacts:
+    files:
+        - ./qotd.zip
