@@ -25,6 +25,8 @@ func main() {
 }
 
 func getQuoteOfTheDay() (*paperquotes.QuoteOfTheDayResponse, *paperquotes.ErrorResponse) {
+	fmt.Println("Starting to get Quote of the Day")
+
 	response, errorResponse := paperquotes.GetQuoteOfTheDay()
 
 	if errorResponse != nil {
