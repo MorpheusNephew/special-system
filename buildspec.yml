@@ -1,6 +1,18 @@
 version: 0.2
 
 phases:
-  install:
-    runtime-versions:
-      golang: 1.14
+    install:
+        runtime-versions:
+            golang: 1.14
+    pre_build:
+        commands:
+            - echo Entering pre build phase
+            - go test ./...
+    build:
+        commands:
+            - echo Entering build phase
+            - go build .\cmd\qotd\main.go
+    post_build:
+        commands:
+            - echo Entering post build phase
+            - ls
