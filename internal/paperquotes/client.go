@@ -114,7 +114,11 @@ func getResponse(redisKey string, req *http.Request) ([]byte, *ErrorResponse) {
 }
 
 func retrieveData(redisKey string, f func() ([]byte, *ErrorResponse)) ([]byte, *ErrorResponse) {
-	cacheResponse, _ := redisClientFactory.GetRedisClient().GetValue(redisKey)
+	cacheResponse, cacheError := redisClientFactory.GetRedisClient().GetValue(redisKey)
+
+	if cacheError != nil {
+		fmt.Printf("Error getting from cache: %v\n", cacheError)
+	}
 
 	if len(cacheResponse) > 0 {
 		fmt.Println("Cache hit")
