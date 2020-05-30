@@ -31,9 +31,9 @@ func init() {
 func GetQuoteOfTheDay() (*QuoteOfTheDayResponse, *ErrorResponse) {
 	redisKey := fmt.Sprintf("%v-qotd", variables.RedisKeyPrefix)
 
-	redisClientFactory.GetRedisClient().GetValue(redisKey)
-
 	body, errorResponse := retrieveData(redisKey, func() ([]byte, *ErrorResponse) {
+		fmt.Println("Cache miss")
+
 		qotdRequest := getQuoteOfTheDayRequest()
 
 		return getResponse(redisKey, qotdRequest)
@@ -117,6 +117,8 @@ func retrieveData(redisKey string, f func() ([]byte, *ErrorResponse)) ([]byte, *
 	cacheResponse, _ := redisClientFactory.GetRedisClient().GetValue(redisKey)
 
 	if len(cacheResponse) > 0 {
+		fmt.Println("Cache hit")
+
 		return cacheResponse, nil
 	}
 
