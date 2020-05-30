@@ -12,7 +12,7 @@ import (
 )
 
 // HandleRequest is the logic that will be ran when a lambda has been invoked
-func HandleRequest(ctx context.Context) (*paperquotes.QuoteOfTheDayResponse, *paperquotes.ErrorResponse) {
+func HandleRequest(ctx context.Context) (*paperquotes.QuoteOfTheDayResponse, err) {
 	return getQuoteOfTheDay()
 }
 
@@ -24,9 +24,10 @@ func main() {
 	}
 }
 
-func getQuoteOfTheDay() (*paperquotes.QuoteOfTheDayResponse, *paperquotes.ErrorResponse) {
+func getQuoteOfTheDay() (*paperquotes.QuoteOfTheDayResponse, err) {
 	fmt.Println("Starting to get Quote of the Day")
 
+	var err error
 	response, errorResponse := paperquotes.GetQuoteOfTheDay()
 
 	if errorResponse != nil {
@@ -36,5 +37,5 @@ func getQuoteOfTheDay() (*paperquotes.QuoteOfTheDayResponse, *paperquotes.ErrorR
 		fmt.Println(response)
 	}
 
-	return response, errorResponse
+	return response, err
 }
