@@ -1,4 +1,4 @@
-Below are your environment variables that will be used to to run this application. You will need to sign up with Paper Quotes to get access to their API
+Below are your environment variables that will need to be added to your environment be used to to run this application. You will need to sign up with Paper Quotes to get access to their API
 
 ENV=local
 PAPER_QUOTES_TOKEN={your token here}
