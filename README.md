@@ -2,9 +2,13 @@
 
 An application written in Go to get the quote of the day. The vision, if you will, for this application is to automatically be deployed to a Lambda function where it can be accessed via AWS API Gateway. I'm writing this in Go because I've been interested in using a language that I do not program in professionally.
 
-## Step 4: Configure application for AWS Lambda (Current)
+## Step 4: Configure application for AWS Lambda (Partially Complete)
 
 This step will include modifying the application code to work for AWS Lambda as well as creating the yaml file that'll be used in conjunction with AWS Code Pipeline for building the application and deploying it to a lambda function.
+
+### Step 4 Update
+
+I was able to set up AWS CodePipeline, but there appears to be a very old [bug](https://forums.aws.amazon.com/thread.jspa?messageID=864336) in regards to taking the artifacts of CodeBuild and deploying them to a lambda function. So instead, I will add a docker file for deploying a local Redis to for anyone that wants to see this application interacting with Redis. If the application can't interact with Redis it will simply hit the API.
 
 ### Logging Note
 
