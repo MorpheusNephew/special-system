@@ -2,9 +2,17 @@
 
 An application written in Go to get the quote of the day. The vision, if you will, for this application is to automatically be deployed to a Lambda function where it can be accessed via AWS API Gateway. I'm writing this in Go because I've been interested in using a language that I do not program in professionally.
 
-## Step 4: Configure application for AWS Lambda (Current)
+## Step 4: Configure application for AWS Lambda (Partially Complete)
 
-This step will include modifying the application code to work for AWS Lambda as well as creating the yaml file that'll be used in conjunction with AWS Code Pipeline for building the application and deploying it to a lambda function
+This step will include modifying the application code to work for AWS Lambda as well as creating the yaml file that'll be used in conjunction with AWS Code Pipeline for building the application and deploying it to a lambda function.
+
+### Step 4 Update
+
+I was able to set up AWS CodePipeline, but there appears to be a very old [bug](https://forums.aws.amazon.com/thread.jspa?messageID=864336) in regards to taking the artifacts of CodeBuild and deploying them to a lambda function. So instead, I will add a docker file for deploying a local Redis to for anyone that wants to see this application interacting with Redis. If the application can't interact with Redis it will simply hit the API.
+
+### Logging Note
+
+Lambda functions written in Go use the standard fmt package to log to [CloudWatch logs](https://docs.aws.amazon.com/lambda/latest/dg/golang-logging.html).
 
 ## Step 3: Implement caching (Completed)
 
@@ -12,7 +20,7 @@ This step includes implementing caching for the quote of the day application so 
 
 ## Step 2: Adding unit tests for application code (Completed)
 
-This step includes adding unit tests for the project. Unit tests are great things, but it'll also be cool when I'm using code pipeline and I can set the pipeline to fail if the unit tests fail. Random note about Go not supporting generics... definitely interesting looking at code that I could potentially create to make it easier on myself if I wanted to use other endpoints and use the same code, but without generics figuring out a way to get around that should be interesting
+This step includes adding unit tests for the project. Unit tests are great things, but it'll also be cool when I'm using code pipeline and I can set the pipeline to fail if the unit tests fail. Random note about Go not supporting generics... definitely interesting looking at code that I could potentially create to make it easier on myself if I wanted to use other endpoints and use the same code, but without generics figuring out a way to get around that should be interesting.
 
 ## Step 1: Build application that gets the Quote of the Day (Completed)
 

@@ -31,9 +31,9 @@ func init() {
 func GetQuoteOfTheDay() (*QuoteOfTheDayResponse, *ErrorResponse) {
 	redisKey := fmt.Sprintf("%v-qotd", variables.RedisKeyPrefix)
 
-	redisClientFactory.GetRedisClient().GetValue(redisKey)
-
 	body, errorResponse := retrieveData(redisKey, func() ([]byte, *ErrorResponse) {
+		fmt.Println("Cache miss")
+
 		qotdRequest := getQuoteOfTheDayRequest()
 
 		return getResponse(redisKey, qotdRequest)
@@ -95,7 +95,8 @@ func getResponse(redisKey string, req *http.Request) ([]byte, *ErrorResponse) {
 
 	utils.PanicIfError(err)
 
-	var cacheTTL *time.Duration = nil
+	var cacheTTL time.Duration
+
 	expiresHeader := response.Header.Get("Expires")
 
 	if len(expiresHeader) > 0 {
@@ -104,10 +105,10 @@ func getResponse(redisKey string, req *http.Request) ([]byte, *ErrorResponse) {
 		utils.PanicIfError(err)
 
 		// TODO (JJ): Find a way to get the absolute value of the tme difference
-		*cacheTTL = expiresHeaderGMT.UTC().Sub(time.Now().UTC())
+		cacheTTL = expiresHeaderGMT.UTC().Sub(time.Now().UTC())
 	}
 
-	redisClientFactory.GetRedisClient().SetValue(redisKey, body, cacheTTL)
+	redisClientFactory.GetRedisClient().SetValue(redisKey, body, &cacheTTL)
 
 	return body, nil
 }
@@ -116,6 +117,8 @@ func retrieveData(redisKey string, f func() ([]byte, *ErrorResponse)) ([]byte, *
 	cacheResponse, _ := redisClientFactory.GetRedisClient().GetValue(redisKey)
 
 	if len(cacheResponse) > 0 {
+		fmt.Println("Cache hit")
+
 		return cacheResponse, nil
 	}
 

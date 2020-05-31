@@ -6,7 +6,7 @@
         {
             "label": "Run main",
             "type": "shell",
-            "command": "go run .\\cmd\\qotd\\main.go"
+            "command": "go run .\\cmd\\qotd.go"
         },
         {
             "label": "Tidy dependencies",
