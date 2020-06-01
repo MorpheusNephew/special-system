@@ -4,24 +4,40 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Run main",
+            "label": "Run qotd",
             "type": "shell",
-            "command": "go run .\\cmd\\qotd.go"
+            "command": "go",
+            "args": ["run", ".\\cmd\\qotd.go"],
+            "options": {
+                "cwd": "${workspaceFolder}\\api"
+            }
         },
         {
-            "label": "Tidy dependencies",
+            "label": "Tidy go dependencies",
             "type": "shell",
-            "command": "go mod tidy"
+            "command": "go",
+            "args": ["mod", "tidy"],
+            "options": {
+                "cwd": "${workspaceFolder}\\api"
+            }
         },
         {
-            "label": "Download modules locally",
+            "label": "Download go modules locally",
             "type": "shell",
-            "command": "go mod download"
+            "command": "go",
+            "args": ["mod", "download"],
+            "options": {
+                "cwd": "${workspaceFolder}\\api"
+            }
         },
         {
-            "label": "Run tests",
+            "label": "Run api tests",
             "type": "shell",
-            "command": "go test ./..."
+            "command": "go",
+            "args": ["test", "./..."],
+            "options": {
+                "cwd": "${workspaceFolder}\\api"
+            }
         }
     ]
 }
