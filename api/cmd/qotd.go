@@ -71,5 +71,5 @@ func initializeAPI() {
 		}
 	})
 
-	router.Run(":3000")
+	router.Run(":3333")
 }
