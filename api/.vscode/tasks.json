@@ -9,7 +9,7 @@
             "command": "go",
             "args": ["run", ".\\cmd\\qotd.go"],
             "options": {
-                "cwd": "${workspaceFolder}\\api"
+                "cwd": "${workspaceFolder}"
             }
         },
         {
@@ -18,7 +18,7 @@
             "command": "go",
             "args": ["mod", "tidy"],
             "options": {
-                "cwd": "${workspaceFolder}\\api"
+                "cwd": "${workspaceFolder}"
             }
         },
         {
@@ -27,16 +27,16 @@
             "command": "go",
             "args": ["mod", "download"],
             "options": {
-                "cwd": "${workspaceFolder}\\api"
+                "cwd": "${workspaceFolder}"
             }
         },
         {
-            "label": "Run api tests",
+            "label": "Run tests",
             "type": "shell",
             "command": "go",
             "args": ["test", "./..."],
             "options": {
-                "cwd": "${workspaceFolder}\\api"
+                "cwd": "${workspaceFolder}"
             }
         }
     ]
