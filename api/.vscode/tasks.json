@@ -1,0 +1,43 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run qotd",
+            "type": "shell",
+            "command": "go",
+            "args": ["run", ".\\cmd\\qotd.go"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Tidy go dependencies",
+            "type": "shell",
+            "command": "go",
+            "args": ["mod", "tidy"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Download go modules locally",
+            "type": "shell",
+            "command": "go",
+            "args": ["mod", "download"],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Run tests",
+            "type": "shell",
+            "command": "go",
+            "args": ["test", "./..."],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        }
+    ]
+}
