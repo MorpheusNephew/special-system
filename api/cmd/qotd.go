@@ -57,9 +57,18 @@ func initializeAPI() {
 	router := gin.Default()
 
 	router.GET("/qotd", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Hello world!",
-		})
+
+		response, errorResponse := paperquotes.GetQuoteOfTheDay()
+
+		if errorResponse != nil {
+			c.JSON(errorResponse.Code, gin.H{
+				"errorMessage": errorResponse.Message,
+			})
+		} else {
+			c.JSON(http.StatusOK, gin.H{
+				"quoteData": response,
+			})
+		}
 	})
 
 	router.Run(":3000")
