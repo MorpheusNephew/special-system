@@ -2,6 +2,10 @@
 
 An application written in Go to get the quote of the day. The vision, if you will, for this application is to automatically be deployed to a Lambda function where it can be accessed via AWS API Gateway. I'm writing this in Go because I've been interested in using a language that I do not program in professionally.
 
+## Step 5: Expose Quote of the Day as an API (Completed)
+
+This step facilitates using the Quote of the Day Go application as an API as long as the environment variable `ENV` is set to `api`. The REST framework used for exposing this application as an API is [Gin & Gonic](https://github.com/gin-gonic/gin) (clever)
+
 ## Step 4: Configure application for AWS Lambda (Partially Complete)
 
 This step will include modifying the application code to work for AWS Lambda as well as creating the yaml file that'll be used in conjunction with AWS Code Pipeline for building the application and deploying it to a lambda function.
