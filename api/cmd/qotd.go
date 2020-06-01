@@ -17,10 +17,10 @@ func HandleRequest(ctx context.Context) (*paperquotes.QuoteOfTheDayResponse, err
 }
 
 func main() {
-	if strings.ToLower(variables.Environment) == "local" {
-		getQuoteOfTheDay()
-	} else {
+	if strings.ToLower(variables.Environment) == "lambda" {
 		lambda.Start(HandleRequest)
+	} else {
+		getQuoteOfTheDay()
 	}
 }
 
