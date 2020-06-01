@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/gin-gonic/gin"
 	"github.com/morpheusnephew/qotd/internal/paperquotes"
 	"github.com/morpheusnephew/qotd/internal/variables"
 )
@@ -25,7 +27,7 @@ func main() {
 		break
 
 	case "api":
-		fmt.Println("API things")
+		initializeAPI()
 		break
 
 	default:
@@ -47,4 +49,18 @@ func getQuoteOfTheDay() (*paperquotes.QuoteOfTheDayResponse, error) {
 	}
 
 	return response, err
+}
+
+func initializeAPI() {
+	fmt.Println("API things")
+
+	router := gin.Default()
+
+	router.GET("/qotd", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "Hello world!",
+		})
+	})
+
+	router.Run(":3000")
 }
