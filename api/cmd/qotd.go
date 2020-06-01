@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/lambda"
@@ -17,9 +16,19 @@ func HandleRequest(ctx context.Context) (*paperquotes.QuoteOfTheDayResponse, err
 }
 
 func main() {
-	if strings.ToLower(variables.Environment) == "lambda" {
+	env := strings.ToLower(variables.Environment)
+
+	switch env {
+
+	case "lambda":
 		lambda.Start(HandleRequest)
-	} else {
+		break
+
+	case "api":
+		fmt.Println("API things")
+		break
+
+	default:
 		getQuoteOfTheDay()
 	}
 }
@@ -31,8 +40,8 @@ func getQuoteOfTheDay() (*paperquotes.QuoteOfTheDayResponse, error) {
 	response, errorResponse := paperquotes.GetQuoteOfTheDay()
 
 	if errorResponse != nil {
-		err := fmt.Errorf("%v %v", errorResponse.Code, errorResponse.Message)
-		log.Fatalln(err)
+		err = fmt.Errorf("%v %v", errorResponse.Code, errorResponse.Message)
+		fmt.Println(err)
 	} else {
 		fmt.Println(response)
 	}
