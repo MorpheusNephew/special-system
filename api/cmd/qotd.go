@@ -62,11 +62,14 @@ func initializeAPI() {
 
 		if errorResponse != nil {
 			c.JSON(errorResponse.Code, gin.H{
-				"message": errorResponse.Message,
+				"error": gin.H{
+					"code":    errorResponse.Code,
+					"message": errorResponse.Message,
+				},
 			})
 		} else {
 			c.JSON(http.StatusOK, gin.H{
-				"quoteData": response,
+				"data": response,
 			})
 		}
 	})
