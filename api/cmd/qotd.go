@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/morpheusnephew/qotd/internal/paperquotes"
 	"github.com/morpheusnephew/qotd/internal/variables"
@@ -56,20 +57,28 @@ func initializeAPI() {
 
 	router := gin.Default()
 
+	router.Use(cors.New(cors.Config{
+		AllowAllOrigins: true,
+		AllowMethods:    []string{"GET"},
+	}))
+
 	router.GET("/qotd", func(c *gin.Context) {
 
 		response, errorResponse := paperquotes.GetQuoteOfTheDay()
 
 		if errorResponse != nil {
 			c.JSON(errorResponse.Code, gin.H{
-				"errorMessage": errorResponse.Message,
+				"error": gin.H{
+					"code":    errorResponse.Code,
+					"message": errorResponse.Message,
+				},
 			})
 		} else {
 			c.JSON(http.StatusOK, gin.H{
-				"quoteData": response,
+				"data": response,
 			})
 		}
 	})
 
-	router.Run(":3000")
+	router.Run(":3333")
 }

@@ -2,9 +2,15 @@
 
 An application written in Go to get the quote of the day. The vision, if you will, for this application is to automatically be deployed to a Lambda function where it can be accessed via AWS API Gateway. I'm writing this in Go because I've been interested in using a language that I do not program in professionally.
 
+## Step 6: Create interface for getting the quote of the day (Completed)
+
+This step consists of building a front-end using React with Typescript to get Quote of the Day from Paper Quotes and display it in quote kind of way.
+
+The project can be ran using the vs code task with the `Start Api and Client` label. Currently it isn't styled that'll be coming up in step 7.
+
 ## Step 5: Expose Quote of the Day as an API (Completed)
 
-This step facilitates using the Quote of the Day Go application as an API as long as the environment variable `ENV` is set to `api`. The REST framework used for exposing this application as an API is [Gin & Gonic](https://github.com/gin-gonic/gin) (clever)
+This step facilitates using the Quote of the Day Go application as an API as long as the environment variable `ENV` is set to `api`. The REST framework used for exposing this application as an API is [Gin & Gonic](https://github.com/gin-gonic/gin) (clever).
 
 ## Step 4: Configure application for AWS Lambda (Partially Complete)
 
