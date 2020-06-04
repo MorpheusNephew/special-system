@@ -1,5 +1,5 @@
 import { Header } from "./header";
-import { Body } from "./body";
+import { Quote } from "./quote";
 import { Footer } from "./footer";
 
-export { Header, Body, Footer };
+export { Header, Quote, Footer };

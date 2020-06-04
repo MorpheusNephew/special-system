@@ -1,10 +1,10 @@
 import * as React from "react";
-import { Header, Footer, Body } from "./components";
+import { Header, Footer, Quote } from "./components";
 
 const App = () => (
   <>
     <Header />
-    <Body />
+    <Quote />
     <Footer />
   </>
 );
