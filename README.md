@@ -15,7 +15,7 @@ Back in step 4 I configured the Quote of the Day application to work on AWS lamb
 pip install pipenv
 ```
 
-- [Docker](https://www.docker.com/) in which your local "AWS" will be running in
+- [Docker](https://www.docker.com/) in which your local "AWS" will be running in via LocalStack
 
 ### Caveats
 
