@@ -2,7 +2,7 @@
 
 An application written in Go to get the quote of the day. The vision, if you will, for this application is to automatically be deployed to a Lambda function where it can be accessed via AWS API Gateway. I'm writing this in Go because I've been interested in using a language that I do not program in professionally.
 
-## Step 7: Introduced [LocalStack](https://github.com/localstack/localstack)
+## Step 7: Introduced [LocalStack](https://github.com/localstack/localstack) (Completed)
 
 Back in step 4 I configured the Quote of the Day application to work on AWS lambda, but had some issues with Code Deploy. I've been thinking/talking about LocalStack a lot recently mostly due to work and thinking through how would I be able ot test using AWS without actually using AWS and incurring costs. The work done during this time was primarily done with tasks for the application and making sure LocalStack was installed via Python
 
