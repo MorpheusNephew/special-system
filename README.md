@@ -19,7 +19,7 @@ pip install pipenv
 
 ### Caveats
 
-There are some [issues](https://gist.github.com/robfe/9a858b59f4d394ef5deb2517833e75c6) with running LocalStack on Windows so you may need to do a little configuring on your end if you want to be able to use the [edge service](https://github.com/localstack/localstack#overview). If not you'll to update the port from `4566 -> 4574` which will eventually be deprecated, so hopefully LocalStack solves the issues with Windows.
+There are some [issues](https://gist.github.com/robfe/9a858b59f4d394ef5deb2517833e75c6) with running LocalStack on Windows so you may need to do a little configuring on your end if you want to be able to use the [edge service](https://github.com/localstack/localstack#overview). If not you'll have to update the port from `4566 -> 4574` which will eventually be deprecated, so hopefully LocalStack solves the issues with Windows.
 
 ## Step 6: Create interface for getting the quote of the day (Completed)
 
