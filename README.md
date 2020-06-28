@@ -2,6 +2,25 @@
 
 An application written in Go to get the quote of the day. The vision, if you will, for this application is to automatically be deployed to a Lambda function where it can be accessed via AWS API Gateway. I'm writing this in Go because I've been interested in using a language that I do not program in professionally.
 
+## Step 7: Introduced [LocalStack](https://github.com/localstack/localstack)
+
+Back in step 4 I configured the Quote of the Day application to work on AWS lambda, but had some issues with Code Deploy. I've been thinking/talking about LocalStack a lot recently mostly due to work and thinking through how would I be able ot test using AWS without actually using AWS and incurring costs. The work done during this time was primarily done with tasks for the application and making sure LocalStack was installed via Python
+
+### What's needed to run
+
+- Python 3.7.7, but you can change the [pip file](./api/Pipfile) to be a version you're currently running on your machine, the lowest version I've ran this code with is Python 3.7.3
+
+- [Pipenv](https://pypi.org/project/pipenv/) which will install all necessary dependencies (LocalStack) using the command
+```cmd
+pip install pipenv
+```
+
+- [Docker](https://www.docker.com/) in which your local "AWS" will be running in via LocalStack
+
+### Caveats
+
+There are some [issues](https://gist.github.com/robfe/9a858b59f4d394ef5deb2517833e75c6) with running LocalStack on Windows so you may need to do a little configuring on your end if you want to be able to use the [edge service](https://github.com/localstack/localstack#overview). If not you'll have to update the port from `4566 -> 4574` which will eventually be deprecated, so hopefully, LocalStack solves the issues with Windows.
+
 ## Step 6: Create interface for getting the quote of the day (Completed)
 
 This step consists of building a front-end using React with Typescript to get Quote of the Day from Paper Quotes and display it in quote kind of way.

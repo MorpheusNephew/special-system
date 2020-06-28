@@ -7,7 +7,10 @@
             "label": "Run qotd",
             "type": "shell",
             "command": "go",
-            "args": ["run", ".\\cmd\\qotd.go"],
+            "args": [
+                "run",
+                ".\\cmd\\qotd.go"
+            ],
             "options": {
                 "cwd": "${workspaceFolder}"
             }
@@ -16,7 +19,10 @@
             "label": "Tidy go dependencies",
             "type": "shell",
             "command": "go",
-            "args": ["mod", "tidy"],
+            "args": [
+                "mod",
+                "tidy"
+            ],
             "options": {
                 "cwd": "${workspaceFolder}"
             }
@@ -25,7 +31,10 @@
             "label": "Download go modules locally",
             "type": "shell",
             "command": "go",
-            "args": ["mod", "download"],
+            "args": [
+                "mod",
+                "download"
+            ],
             "options": {
                 "cwd": "${workspaceFolder}"
             }
@@ -34,10 +43,97 @@
             "label": "Run tests",
             "type": "shell",
             "command": "go",
-            "args": ["test", "./..."],
+            "args": [
+                "test",
+                "./..."
+            ],
             "options": {
                 "cwd": "${workspaceFolder}"
             }
+        },
+        {
+            "label": "Build QOTD",
+            "detail": "Builds QOTD app for linux to be ran on a lambda function",
+            "type": "shell",
+            "command": "go",
+            "args": [
+                "build",
+                "./cmd/qotd.go"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "GOOS": "linux"
+                }
+            }
+        },
+        {
+            "label": "Zip QOTD",
+            "detail": "Zips the QOTD to then be used to deploy to a lambda function",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "zipfile",
+                "-c",
+                "qotd.zip",
+                "qotd"
+            ]
+        },
+        {
+            "label": "Create Lambda (localstack)",
+            "detail": "This task creates the qotd lambda function within Localstack (must provide your own PAPER_QUOTES_TOKEN)",
+            "type": "shell",
+            "command": "aws",
+            "args": [
+                "--endpoint-url",
+                "http://localhost:4566",
+                "lambda",
+                "create-function",
+                "--function-name",
+                "quote-of-the-day",
+                "--runtime",
+                "go1.x",
+                "--role",
+                "fake-role",
+                "--zip-file",
+                "fileb://qotd.zip",
+                "--handler",
+                "qotd",
+                "--environment",
+                "\"Variables={ENV=lambda,PAPER_QUOTES_TOKEN={MUST GET API TOKEN FROM PAPER QUOTES},REDIS_ENDPOINT=localhost,REDIS_KEY_PREFIX=local,REDIS_PORT=6379}\""
+            ],
+            "dependsOn": [
+                "Build QOTD",
+                "Zip QOTD"
+            ],
+            "dependsOrder": "sequence"
+        },
+        {
+            "label": "Invoke Lambda (Localstack)",
+            "detail": "Invokes the quote of the day lambda function and returns the response in response.json (must have localstack running and have already created the lambda function)",
+            "command": "aws",
+            "args": [
+                "--endpoint-url",
+                "http://localhost:4566",
+                "lambda",
+                "invoke",
+                "--function-name",
+                "quote-of-the-day",
+                "response.json"
+            ]
+        },
+        {
+            "label": "Start Localstack",
+            "detail": "Starts localstack (a new instance on every start)",
+            "command": [
+                "pipenv"
+            ],
+            "args": [
+                "run",
+                "localstack",
+                "start"
+            ]
         }
     ]
 }
